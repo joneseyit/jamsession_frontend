@@ -1,0 +1,15 @@
+
+
+#session-header img{
+  height: 20rem;
+width: 30rem;
+}
+
+#session-header {
+  display: flex;
+  justify-content: center;
+  background: #515DA2;
+  opacity: .8;
+  height: 22rem;
+  padding: 1rem;
+}
