@@ -13,3 +13,23 @@ width: 30rem;
   height: 22rem;
   padding: 1rem;
 }
+
+#sign-in{
+  padding: 2 rem;
+  width: 80%;
+  height:auto;
+  display: block;
+  background: none;
+  opacity: 1;
+
+
+}
+
+.container{
+  padding: 2 rem;
+  width: stretch;
+  height:auto;
+  display: block;
+  background: none;
+  opacity: 1;
+}
