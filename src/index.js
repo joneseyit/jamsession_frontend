@@ -29,12 +29,26 @@ function fetchSessions(){
   fetch(sessionsUrl)
   .then(res => res.json())
   .then(json => json.forEach(renderSession))
-  .then(addEditListener)
-  .then(addJoinHandler)
-  .then(addCreateHandler)
-  .then(toggleProfileHandler)
+  .then(addButtonsNListeners)
 }
 
+function addButtonsNListeners(){
+  addEditListener()
+  addJoinHandler()
+  addCreateHandler()
+  toggleProfileHandler()
+  addDeleteButtonsYeah()
+  addHomeListener()
+}
+function addHomeListener(){
+  let home = document.querySelector("#home")
+  home.addEventListener('click', renderHome)
+}
+
+function renderHome(event){
+document.querySelector('#profile').nextElementSibling.innerHTML = ""
+document.querySelector("#create-sesh").nextElementSibling.innerHTML = ""
+}
 function fetchUsers(){
   fetch(usersUrl)
   .then(res => res.json())
@@ -61,6 +75,7 @@ let sessionHtml = `
         <flash-message name="flash-fixed"></flash-message>
         <button class="join-sesh" >Join Sesh</button>
         <button class="edit-sesh" >Edit Sesh</button>
+        <button class="delete-sesh" >Delete Sesh</button>
           <div class="edit-container">
 
           </div>
@@ -83,6 +98,7 @@ function addJoinHandler(){
 
 function processJoinSession(event){
   event.preventDefault()
+  window.alert("You joined a sesh.  Bam!")
   let userId = "1"
   let sessionId = event.target.parentNode.dataset.id
   let request = new Request(userSessionsUrl)
@@ -162,27 +178,29 @@ function addCreateHandler(){
 
 function toggleSeshForm(e){
   e.preventDefault()
-
   let container = e.target.nextElementSibling
   if(toggleCreate === false){
   container.innerHTML =   `
     <form id="create-form">
       <input type="text" name="title" placeholder="Title">
       <input type="textarea" name="description" placeholder="Gimme the deets.">
-      <input type="text" name="time" placeholder="Time">
+      <input type="datetime-local" id="session-time"
+       name="time">
       <input type="text" name="location" placeholder="Location">
       <input  type="submit" value="Jam Away"/>
     </form>
     `
+     document.querySelector("#create-form").addEventListener('submit', createSesh)
   } else {
     container.innerHTML = ""
   }
   toggleCreate = !toggleCreate
-  document.querySelector("#create-form").addEventListener('submit', createSesh)
+
 
 }
 
 function createSesh(e){
+  debugger
   e.preventDefault()
   let title = e.target.title.value
   let description = e.target.description.value
@@ -204,6 +222,7 @@ function createSesh(e){
   }
 
   fetch(request, options)
+document.querySelector("#create-sesh").nextElementSibling.innerHTML = "You made a jam sesh.  Nice."
 }
 
 function toggleProfileHandler(){
@@ -213,7 +232,6 @@ function toggleProfileHandler(){
 
 function toggleProfile(e){
   e.preventDefault()
-  debugger
   let user = usersList.find(k => k.username === "Ymir Man")
   let container = document.querySelector('#profile').nextElementSibling
   if(toggleProfileStatus === false){
@@ -230,4 +248,22 @@ function toggleProfile(e){
     container.innerHTML = ""
   }
   toggleProfileStatus = !toggleProfileStatus
+}
+
+function addDeleteButtonsYeah(){
+  let buttons = document.querySelectorAll(".delete-sesh")
+  buttons.forEach(button => button.addEventListener('click', processDeleteButton))
+}
+
+function processDeleteButton(e){
+  e.preventDefault()
+  let id = e.target.parentNode.dataset.id
+  e.target.parentNode.remove()
+  let options = {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }
+  fetch(`http://localhost:3000/api/v1/sessions/${id}`, options)
 }
