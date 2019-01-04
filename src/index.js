@@ -39,12 +39,23 @@ function addButtonsNListeners(){
   toggleProfileHandler()
   addDeleteButtonsYeah()
   addHomeListener()
+  addMessageListener()
 }
 function addHomeListener(){
   let home = document.querySelector("#home")
   home.addEventListener('click', renderHome)
 }
 
+function addMessageListener(){
+  document.querySelector(".message-container").addEventListener('transitionend', removeMessage)
+}
+
+function removeMessage(e){
+  this.classList.remove('change-message-container')
+  e.target.innerHTML = ""
+  // if(e.propertyName !== 'transform') return;
+  //   e.target.remove('message-container')
+}
 function renderHome(event){
 document.querySelector('#profile').nextElementSibling.innerHTML = ""
 document.querySelector("#create-sesh").nextElementSibling.innerHTML = ""
@@ -63,22 +74,23 @@ function createUsers(json){
 }
 
 function renderSession(session){
+  let id = session.id
 let sessionHtml = `
 <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
   <div class="card" style="width: 18rem">
       <div class="card-body" data-id="${session.id}" data-title="${session.title}" data-time="${session.time}" data-location="${session.location}"
       data-description="${session.description}">
-        <h5 class="card-text" >Title: ${session.title}</h5>
-        <p class="card-text" >Description: ${session.description}</p>
-        <p class="card-text">Time: ${session.time}</p>
-        <p class="card-text">Location: ${session.location}</p>
-        <flash-message name="flash-fixed"></flash-message>
+        <h5 id="title-${id}" class="card-text" >Title: ${session.title}</h5>
+        <p id="description-${id}" class="card-text" >Description: ${session.description}</p>
+        <p id="time-${id}" class="card-text">Time: ${session.time}</p>
+        <p id="location-${id}" class="card-text">Location: ${session.location}</p>
         <button class="join-sesh" >Join Sesh</button>
         <button class="edit-sesh" >Edit Sesh</button>
-        <button class="delete-sesh" >Delete Sesh</button>
-          <div class="edit-container">
+        <div class="edit-container">
 
-          </div>
+        </div>
+        <button class="delete-sesh" >Delete Sesh</button>
+
       </div>
     </div>
   </div>
@@ -96,9 +108,14 @@ function addJoinHandler(){
 
 }
 
+function addMessage(message){
+document.querySelector(".message-container").classList.add('change-message-container')
+document.querySelector(".message-container").innerHTML = message
+}
+
 function processJoinSession(event){
   event.preventDefault()
-  window.alert("You joined a sesh.  Bam!")
+  addMessage('You joined a sesh.  Bam!')
   let userId = "1"
   let sessionId = event.target.parentNode.dataset.id
   let request = new Request(userSessionsUrl)
@@ -129,7 +146,6 @@ function showEditForm(event){
 
   event.preventDefault()
   let id = event.target.parentNode.dataset.id
-  let request = new Request(`${sessionsUrl}/${id}`)
   let editForm = event.target.nextElementSibling
   let title = event.target.parentNode.dataset.title
   let desc = event.target.parentNode.dataset.description
@@ -146,15 +162,17 @@ function showEditForm(event){
     `
 
     let form = document.querySelector(`#edit-form-${id}`)
-    form.addEventListener('submit', processEditForm)
+    editForm.addEventListener('submit', processEditForm)
 }
 
 function processEditForm(event){
   event.preventDefault()
+  addMessage("You edited a sesh.  Gold star.")
   let id = event.target.parentNode.parentNode.dataset.id
   let title = event.target.title.value
   let description = event.target.description.value
   let time = event.target.time.value
+  let location = event.target.location.value
   // let request = new Request(`${sessionsUrl}/${id}`)
   let options = {
     method: 'PATCH',
@@ -169,6 +187,11 @@ function processEditForm(event){
   }
   fetch(`${sessionsUrl}/${id}`, options)
   document.querySelector(`#edit-form-${id}`).style.display = 'none'
+  document.querySelector(`#title-${id}`).innerText = `Title: ${title}`
+  document.querySelector(`#description-${id}`).innerText = `Description: ${description}`
+  document.querySelector(`#time-${id}`).innerText = `Time: ${time}`
+  document.querySelector(`#location-${id}`).innerText = `Location: ${location}`
+
 }
 //refactor to include all navv bar function
 function addCreateHandler(){
@@ -200,7 +223,6 @@ function toggleSeshForm(e){
 }
 
 function createSesh(e){
-  debugger
   e.preventDefault()
   let title = e.target.title.value
   let description = e.target.description.value
@@ -222,7 +244,9 @@ function createSesh(e){
   }
 
   fetch(request, options)
-document.querySelector("#create-sesh").nextElementSibling.innerHTML = "You made a jam sesh.  Nice."
+  document.querySelector("#create-sesh").nextElementSibling.innerHTML = ""
+  addMessage("You made a jam session.  Nice.")
+// document.querySelector("#create-sesh").nextElementSibling.innerHTML = "You made a jam sesh.  Nice."
 }
 
 function toggleProfileHandler(){
@@ -266,4 +290,5 @@ function processDeleteButton(e){
     }
   }
   fetch(`http://localhost:3000/api/v1/sessions/${id}`, options)
+  addMessage("You deleted a session.  Ouch.")
 }

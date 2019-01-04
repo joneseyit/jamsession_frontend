@@ -33,3 +33,17 @@ width: 30rem;
   background: none;
   opacity: 1;
 }
+
+.change-message-container {
+  border: .4rem solid black;
+  border-radius: .5rem;
+  margin: 1rem;
+  font-size: 1.5rem;
+  padding: .5rem .5rem;
+  transition: all 5s ease;
+  width: 10rem;
+  text-align: center;
+  color: white;
+  background: rgba(0,0,0,0.4);
+  text-shadow: 0 0 .5rem black;
+}
